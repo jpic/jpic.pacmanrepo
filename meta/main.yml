@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: James Pic
+  description: Arch Linux signed package repository.
+  company: YourLabs
+  license: BSD
+  categories:
+  - system

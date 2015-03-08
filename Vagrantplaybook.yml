@@ -1,0 +1,29 @@
+---
+
+- hosts: all
+
+  vars:
+    pacmanrepo_source: _example_build
+    pacmanrepo_name: testrepo
+
+  roles:
+  - role: jpic.gpg
+    gpg_export_private_key: yes
+
+  - role: .
+    pacmanrepo_architecture: any
+
+  - role: .
+    pacmanrepo_architecture: x86_64
+
+  - role: .
+    pacmanrepo_architecture: i686
+
+  - role: jpic.pacman
+    pacman_repositories:
+    - name: testrepo
+      url: file:///home/vagrant/repo/os/$arch
+
+  post_tasks:
+  - pacman: name=debootstrap state=installed
+    sudo: yes

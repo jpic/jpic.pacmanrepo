@@ -1,0 +1,5 @@
+---
+
+pacmanrepo_source: ~/build
+pacmanrepo_destination: ~/repo
+pacmanrepo_architectures: ['x86_64', 'i686', 'any']

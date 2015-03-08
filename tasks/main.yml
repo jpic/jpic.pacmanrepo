@@ -1,0 +1,37 @@
+---
+
+- file: 
+    path: '{{ pacmanrepo_destination }}/os/{{ pacmanrepo_architecture }}'
+    state: directory
+
+- pacmanrepo_find_packages: src={{ pacmanrepo_source }} arch={{ pacmanrepo_architecture }}
+  connection: local
+  register: pacmanrepo_found_packages
+
+- copy:
+    src: '{{ item }}'
+    dest: '{{ pacmanrepo_destination }}/os/{{ pacmanrepo_architecture }}'
+  with_items: pacmanrepo_found_packages.sources
+  notify: rebuild db {{ pacmanrepo_architecture }}
+
+- copy:
+    src: '{{ item }}.sig'
+    dest: '{{ pacmanrepo_destination }}/os/{{ pacmanrepo_architecture }}'
+  with_items: pacmanrepo_found_packages.sources
+  notify: rebuild db {{ pacmanrepo_architecture }}
+
+- shell: find {{ pacmanrepo_destination }}/os/any -type f
+  register: pacmanrepo_find_any
+  changed_when: false
+
+- file:
+    src: '{{ item }}'
+    dest: "{{ item.replace('/any/', '/' + pacmanrepo_architecture + '/') }}"
+    state: link
+  notify: rebuild db {{ pacmanrepo_architecture }}
+  when: pacmanrepo_architecture != 'any' and '-any.pkg.' in item
+  with_items: pacmanrepo_find_any.stdout_lines
+
+- debug: var=pacmanrepo_architecture
+
+- meta: flush_handlers

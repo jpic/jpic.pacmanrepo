@@ -1,0 +1,44 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+import os.path
+import subprocess
+
+from ansible.module_utils.basic import *
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            src=dict(),
+            arch=dict(),
+        ),
+        supports_check_mode=True
+    )
+
+    src = module.params['src']
+    arch = module.params['arch']
+
+    sources = []
+        
+    out = subprocess.check_output("find %s -name '*.pkg.*.sig'" % src,
+            shell=True)
+
+    for signature in out.split('\n'):
+        path = signature[:-4]
+
+        if not os.path.exists(path):
+            continue
+
+        match = re.search('-([\w_]+).pkg', path)
+
+        if match is None:
+            continue
+
+        if match.group(1) != arch:
+            continue
+
+        sources.append(path)
+
+    module.exit_json(changed=False, sources=sources)
+
+main()

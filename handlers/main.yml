@@ -1,0 +1,4 @@
+---
+
+- name: rebuild db {{ pacmanrepo_architecture }}
+  shell: repo-add --verify --sign {{ pacmanrepo_destination }}/os/{{ pacmanrepo_architecture }}/{{ pacmanrepo_name }}.db.tar.gz {{ pacmanrepo_destination }}/os/{{ pacmanrepo_architecture }}/*.pkg.*
